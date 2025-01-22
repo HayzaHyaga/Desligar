@@ -80,4 +80,14 @@ scheduled_time_label = tk.Label(app, text="Nenhum desligamento agendado.", fg="b
 scheduled_time_label.pack(pady=20)
 
 app.geometry("350x300")
+
+# Função para esconder a janela
+def on_close():
+    app.withdraw()  # Minimiza a janela
+    # Quando a janela for minimizada, o app continua rodando
+    app.after(100, on_close)
+
+# Configura o comportamento ao fechar
+app.protocol("WM_DELETE_WINDOW", on_close)
+
 app.mainloop()
