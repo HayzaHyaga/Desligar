@@ -5,12 +5,13 @@ from datetime import datetime, timedelta
 import time
 import threading
 
-# Variável global para controlar o agendamento
+# Variáveis globais para controlar o agendamento
 shutdown_scheduled = False
 shutdown_thread = None
+scheduled_time_label = None  # Para exibir o horário agendado
 
 def schedule_shutdown():
-    global shutdown_scheduled, shutdown_thread
+    global shutdown_scheduled, shutdown_thread, scheduled_time_label
 
     if shutdown_scheduled:
         messagebox.showerror("Erro", "Já existe um desligamento agendado. Cancele antes de agendar outro.")
@@ -26,10 +27,14 @@ def schedule_shutdown():
 
         time_difference = (shutdown_datetime - now).total_seconds()
 
-        messagebox.showinfo("Agendamento", f"O computador será desligado às {shutdown_time}.\nTodos os programas abertos serão fechados.")
         shutdown_scheduled = True
         shutdown_thread = threading.Thread(target=shutdown_after_delay, args=(time_difference,))
         shutdown_thread.start()
+
+        # Atualiza o rótulo com o horário agendado
+        scheduled_time_label.config(text=f"Desligamento agendado para: {shutdown_datetime.strftime('%H:%M')}")
+
+        messagebox.showinfo("Agendamento", f"O computador será desligado às {shutdown_time}.\nTodos os programas abertos serão fechados.")
     except ValueError:
         messagebox.showerror("Erro", "Insira o horário no formato HH:MM.")
 
@@ -48,6 +53,10 @@ def cancel_shutdown():
 
     os.system("shutdown /a")  # Comando para abortar o desligamento
     shutdown_scheduled = False
+
+    # Limpa o rótulo do horário agendado
+    scheduled_time_label.config(text="Nenhum desligamento agendado.")
+
     messagebox.showinfo("Cancelar", "O desligamento agendado foi cancelado.")
 
 # Interface gráfica
@@ -66,5 +75,9 @@ button_schedule.pack(pady=10)
 button_cancel = tk.Button(app, text="Cancelar", command=cancel_shutdown, bg="red", fg="white")
 button_cancel.pack(pady=10)
 
-app.geometry("300x250")
+# Rótulo para exibir o horário agendado
+scheduled_time_label = tk.Label(app, text="Nenhum desligamento agendado.", fg="blue", font=("Arial", 12))
+scheduled_time_label.pack(pady=20)
+
+app.geometry("350x300")
 app.mainloop()
