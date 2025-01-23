@@ -5,10 +5,9 @@ from datetime import datetime, timedelta
 import time
 import threading
 
-# Variáveis globais para controlar o agendamento
 shutdown_scheduled = False
 shutdown_thread = None
-scheduled_time_label = None  # Para exibir o horário agendado
+scheduled_time_label = None 
 
 def schedule_shutdown():
     global shutdown_scheduled, shutdown_thread, scheduled_time_label
@@ -31,7 +30,6 @@ def schedule_shutdown():
         shutdown_thread = threading.Thread(target=shutdown_after_delay, args=(time_difference,))
         shutdown_thread.start()
 
-        # Atualiza o rótulo com o horário agendado
         scheduled_time_label.config(text=f"Desligamento agendado para: {shutdown_datetime.strftime('%H:%M')}")
 
         messagebox.showinfo("Agendamento", f"O computador será desligado às {shutdown_time}.\nTodos os programas abertos serão fechados.")
@@ -41,7 +39,7 @@ def schedule_shutdown():
 def shutdown_after_delay(delay):
     global shutdown_scheduled
     time.sleep(delay)
-    if shutdown_scheduled:  # Verifica se o agendamento não foi cancelado
+    if shutdown_scheduled: 
         os.system("shutdown /s /f /t 1")
 
 def cancel_shutdown():
@@ -51,15 +49,13 @@ def cancel_shutdown():
         messagebox.showinfo("Cancelar", "Nenhum desligamento agendado para cancelar.")
         return
 
-    os.system("shutdown /a")  # Comando para abortar o desligamento
+    os.system("shutdown /a") 
     shutdown_scheduled = False
 
-    # Limpa o rótulo do horário agendado
     scheduled_time_label.config(text="Nenhum desligamento agendado.")
 
     messagebox.showinfo("Cancelar", "O desligamento agendado foi cancelado.")
 
-# Interface gráfica
 app = tk.Tk()
 app.title("Agendar Desligamento")
 
@@ -75,19 +71,15 @@ button_schedule.pack(pady=10)
 button_cancel = tk.Button(app, text="Cancelar", command=cancel_shutdown, bg="red", fg="white")
 button_cancel.pack(pady=10)
 
-# Rótulo para exibir o horário agendado
 scheduled_time_label = tk.Label(app, text="Nenhum desligamento agendado.", fg="blue", font=("Arial", 12))
 scheduled_time_label.pack(pady=20)
 
 app.geometry("350x300")
 
-# Função para esconder a janela
 def on_close():
-    app.withdraw()  # Minimiza a janela
-    # Quando a janela for minimizada, o app continua rodando
+    app.withdraw() 
     app.after(100, on_close)
 
-# Configura o comportamento ao fechar
 app.protocol("WM_DELETE_WINDOW", on_close)
 
 app.mainloop()
